@@ -26,4 +26,4 @@ jobs:
 
     - name: Install
       run: |
-        aws ssm send-command --document-name "install_docker" --targets Key=tag:Role,Values=docker
+        aws ssm send-command --document-name "install_docker" --instance-ids "${{ vars.DOCKER_INSTANCE_ID }}"

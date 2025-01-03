@@ -146,6 +146,7 @@ resource "aws_route" "route" {
 resource "aws_ssm_document" "install_docker" {
   name = "install_docker"
   document_type = "Command"
+  target_type = "/AWS::EC2::Instance"
   content = <<DOC
   {
     "schemaVersion": "2.2",
