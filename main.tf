@@ -152,10 +152,10 @@ resource "aws_ssm_document" "install_docker" {
     "parameters": {},
     "mainSteps": [
       {
-        "action": "aws:runShellScript",
-        "name": "install-docker",
+        "action": "aws:runPowerShellScript",
+        "name": "install_docker",
         "inputs": {
-          "runCommand": [
+          "runCommand": [ 
             "sudo yum update -y",
             "sudo yum install -y docker",
             "sudo service docker start",
