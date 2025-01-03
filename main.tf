@@ -20,8 +20,6 @@ terraform {
 
 provider "aws" {
   region = var.region
-  profile = "default"
-  shared_credentials_files = ["~/.aws/credentials"]
 }
 
 data "aws_ami" "amzn-linux-2023-ami" {
