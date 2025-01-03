@@ -149,6 +149,7 @@ resource "aws_ssm_document" "install_docker" {
   {
     "schemaVersion": "2.2",
     "description": "Install Docker",
+    "parameters": {},
     "mainSteps": [
       {
         "action": "aws:runShellScript",
