@@ -36,4 +36,4 @@ jobs:
       run: |
         INSTANCE_ID=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=autocross_timer' --output text --query 'Reservations[*].Instances[*].InstanceId')
         scp -i ~/.ssh/id_rsa /tmp/data.tar.gz ec2-user@$INSTANCE_ID:data.tar.gz
-        ssh -i ~/.ssh/id_rsa ec2-user@$INSTANCE_ID 'rm -rf build-temp && mkdir build-temp && cd build-temp && tar -xzf data.tar.gz && sh./init-letsencrypt && docker-compose -f docker-compose-dev.yaml up -d --build && cd .. && rm -rf build-temp'
+        ssh -i ~/.ssh/id_rsa ec2-user@$INSTANCE_ID 'rm -rf build-temp && mkdir build-temp && tar -xzf data.tar.gz -C ./build-temp && cd build-temp && sh./init-letsencrypt && docker-compose -f docker-compose-dev.yaml up -d --build && cd .. && rm -rf build-temp'
