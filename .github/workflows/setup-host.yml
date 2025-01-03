@@ -26,4 +26,5 @@ jobs:
 
     - name: Install
       run: |
-        aws ssm send-command --document-name "install_docker" --instance-ids "${{ vars.DOCKER_INSTANCE_ID }}"
+        INSTANCE_ID=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=autocross_timer' --output text --query 'Reservations[*].Instances[*].InstanceId')
+        aws ssm send-command --document-name "install_docker" --instance-ids $INSTANCE_ID
