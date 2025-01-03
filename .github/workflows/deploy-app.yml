@@ -1,0 +1,39 @@
+name: 'Deploy application'
+
+on: workflow_dispatch
+
+env:
+  AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+  AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+  AWS_DEFAULT_REGION: "ca-central-1"
+
+jobs:
+  deploy:
+    name: 'Copy files'
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        cp ./data/.ssh/config ~/.ssh/config
+
+    - name: Compress data
+      run: |
+        tar -czf /tmp/data.tar.gz .
+    
+    - name: Transfer data and start docker
+      run: |
+        INSTANCE_ID=$(aws ec2 describe-instances --filters 'Name=tag:Name,Values=autocross_timer' --output text --query 'Reservations[*].Instances[*].InstanceId')
+        scp -i ~/.ssh/id_rsa /tmp/data.tar.gz ec2-user@$INSTANCE_ID:data.tar.gz
+        ssh -i ~/.ssh/id_rsa ec2-user@$INSTANCE_ID 'tar -xzf data.tar.gz && docker compose -f docker-compose-dev.yaml up -d'
