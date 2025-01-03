@@ -81,7 +81,8 @@ resource "aws_security_group" "autocross_timer_sg" {
   name = "autocross_timer_sg"
 
   tags = {
-    Name = "autocross_timer_sg"
+    Name = "autocross_timer_sg",
+    Role = "docker"
   }
 
   egress {
