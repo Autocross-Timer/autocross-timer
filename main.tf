@@ -1,5 +1,25 @@
+variable "region" {
+  description = "The AWS region to deploy the resources"
+  type        = string
+  default     = "ca-central-1"
+}
+
+variable "subnet" {
+  description = "The subnet to deploy the resources"
+  type        = string
+  default     = "ca-central-1a"
+}
+
+terraform {
+  backend "s3" {
+    bucket = "terraform-state-autocross-timer"
+    key    = "terraform.tfstate"
+    region = "ca-central-1"
+  }
+}
+
 provider "aws" {
-  region = "ca-central-1"
+  region = var.region
   profile = "default"
   shared_credentials_files = ["~/.aws/credentials"]
 }
@@ -25,7 +45,7 @@ resource "aws_vpc" "autocross_timer_vpc" {
 resource "aws_subnet" "autocross_timer_subnet" {
   vpc_id            = aws_vpc.autocross_timer_vpc.id
   cidr_block        = "172.16.10.0/24"
-  availability_zone = "ca-central-1a"
+  availability_zone = var.subnet
 
   tags = {
     Name = "autocross_timer_subnet"
