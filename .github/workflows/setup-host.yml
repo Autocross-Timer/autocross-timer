@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   deploy:
-    name: 'Terraform'
+    name: 'Install Docker'
     runs-on: ubuntu-latest
     environment: production
 
@@ -28,4 +28,4 @@ jobs:
       run: |
         aws ssm send-command \
             --document-name "install_docker" \
-            -- targets "tag:Name=autocross_timer" \
+            --targets "Key=tag:Name,Values=autocross_timer" \
