@@ -1,0 +1,35 @@
+services:
+  web:
+    build: ./frontend
+    expose: 
+      - 80
+    networks:
+      - frontend
+  api:
+    build: ./backend
+    expose:
+      - 8000
+    networks:
+      - frontend
+      - backend
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - frontend
+    volumes:
+      - ./data/prod/nginx:/etc/nginx/conf.d
+  certbot:
+    image: certbot/certbot
+    networks:
+      - backend
+  db:
+    image: tbd
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:

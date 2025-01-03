@@ -1,0 +1,2 @@
+curl -X POST http://localhost:8000/runs -d '{"runNumber":3,"carNumber":1,"rawTime":100,"paxTime":90,"class":"Street","name":"Jared Kelly","cones":1}' -H "Content-Type: application/json"
+curl -X POST http://localhost:8000/login -d '{"username":"admin","password":"password"}' -H "Content-Type: application/json"
