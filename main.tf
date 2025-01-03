@@ -168,3 +168,7 @@ resource "aws_ssm_document" "install_docker" {
   }
   DOC
 }
+
+resource "aws_ec2_instance_metadata_defaults" "allow_tags" {
+  instance_metadata_tags = "enabled"
+}
