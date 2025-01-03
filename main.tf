@@ -153,7 +153,7 @@ resource "aws_ssm_document" "install_docker" {
     "parameters": {},
     "mainSteps": [
       {
-        "action": "aws:runPowerShellScript",
+        "action": "aws:runShellScript",
         "name": "install_docker",
         "inputs": {
           "runCommand": [ 
