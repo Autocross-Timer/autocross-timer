@@ -1,0 +1,31 @@
+name: 'Setup Docker Host'
+
+on: workflow_dispatch
+
+env:
+  AWS_ACCESS_KEY_ID: "${{ secrets.AWS_ACCESS_KEY_ID }}"
+  AWS_SECRET_ACCESS_KEY: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+  AWS_DEFAULT_REGION: "ca-central-1"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+    environment: production
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install
+      run: |
+        aws ssm send-command \
+            --document-name "install_docker" \
+            -- targets "tag:Name=autocross_timer" \

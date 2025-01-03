@@ -141,3 +141,28 @@ resource "aws_route" "route" {
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.autocross_timer_igw.id
 }
+
+resource "aws_ssm_document" "install_docker" {
+  name = "install_docker"
+  document_type = "Command"
+  content = <<DOC
+  {
+    "schemaVersion": "2.2",
+    "description": "Install Docker",
+    "mainSteps": [
+      {
+        "action": "aws:runShellScript",
+        "name": "install-docker",
+        "inputs": {
+          "runCommand": [
+            "sudo yum update -y",
+            "sudo yum install -y docker",
+            "sudo service docker start",
+            "sudo usermod -a -G docker ec2-user"
+          ]
+        }
+      }
+    ]
+  }
+  DOC
+}
