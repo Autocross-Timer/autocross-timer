@@ -102,6 +102,14 @@ resource "aws_vpc_security_group_ingress_rule" "allow_https" {
   to_port           = 443
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_http" {
+  security_group_id = aws_security_group.autocross_timer_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+
 resource "aws_iam_role" "ssm_role" {
   name = "SSMRole"
 
