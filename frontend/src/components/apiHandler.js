@@ -1,4 +1,4 @@
-const API_URL = `http://live.jaredkelly.ca:80/api`;
+const API_URL = `https://live.jaredkelly.ca/api`;
 
 export function getAllRuns() {
     return fetch(`${API_URL}/runs/`)
