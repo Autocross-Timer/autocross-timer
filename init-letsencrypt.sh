@@ -5,9 +5,9 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(live.jaredkelly.ca)
+domains="live.jaredkelly.ca"
 rsa_key_size=4096
-data_path="~/cert-data/certbot"
+data_path="/home/ec2-user/cert-data/certbot"
 email="certs@jaredkelly.ca" # Adding a valid address is strongly recommended
 staging=1 # Set to 1 if you're testing your setup to avoid hitting request limits
 
@@ -41,8 +41,8 @@ echo
 
 
 echo "### Starting nginx, api, and web ..."
-docker-compose -f docker-compose-prod.yaml up --force-recreate -d api
-docker-compose -f docker-compose-prod.yaml up --force-recreate -d web
+docker-compose -f docker-compose-prod.yaml up  -d api
+docker-compose -f docker-compose-prod.yaml up  -d web
 docker-compose -f docker-compose-prod.yaml up --force-recreate -d nginx
 echo
 
@@ -56,10 +56,8 @@ echo
 
 echo "### Requesting Let's Encrypt certificate for $domains ..."
 #Join $domains to -d args
-domain_args=""
-for domain in "${domains[@]}"; do
-  domain_args="$domain_args -d $domain"
-done
+domain_args="-d $domains"
+
 
 # Select appropriate email arg
 case "$email" in
@@ -82,4 +80,4 @@ docker-compose -f docker-compose-prod.yaml run --rm --entrypoint "\
 echo
 
 echo "### Reloading nginx ..."
-docker-compose -f docker-compose-prod.yaml exec nginx nginx -s reload
+docker-compose -f docker-compose-prod.yaml stop
