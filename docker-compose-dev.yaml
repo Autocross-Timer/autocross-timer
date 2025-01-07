@@ -19,7 +19,7 @@ services:
     networks:
       - frontend
     volumes:
-      - ./data/dev/nginx:/etc/nginx/conf.d
+      - ~/data/dev/nginx:/etc/nginx/conf.d
 
 networks:
   frontend:
