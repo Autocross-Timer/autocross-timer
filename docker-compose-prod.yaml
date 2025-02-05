@@ -1,6 +1,9 @@
 services:
   web:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     depends_on:
       - api
     expose: 
