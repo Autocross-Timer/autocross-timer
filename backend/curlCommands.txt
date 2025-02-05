@@ -1,2 +1,4 @@
-curl -X POST http://localhost:8000/runs -d '{"runNumber":3,"carNumber":1,"rawTime":100,"paxTime":90,"class":"Street","name":"Jared Kelly","cones":1}' -H "Content-Type: application/json"
+curl -X POST http://localhost:8000/runs/1 -d '{"runNumber":3,"carNumber":1,"rawTime":100,"paxTime":90,"carClass":"Street","driverName":"Jared Kelly","cones":1}' -H "Content-Type: application/json"
 curl -X POST http://localhost:8000/login -d '{"username":"admin","password":"password"}' -H "Content-Type: application/json"
+curl -X POST http://localhost:8000/events -d '{"eventId":"3","clubName":"MCO","eventLocation":"CTC","eventDate":"2025-02-01","EventNumber":3}'
+curl -X POST http://localhost:8000/events -d '{"eventId":"3adsf","clubName":"MCO","eventLocation":"CTC","eventDate":"2025-02-02","EventNumber":4}'

@@ -31,6 +31,11 @@ const router = createRouter({
     {
       path: '/car',
       redirect: '/'
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../views/AdminView.vue'),
     }
   ],
 })

@@ -1,55 +1,98 @@
 package main
 
 import (
-    "encoding/json"
+	"encoding/json"
 	"fmt"
-    "log"
-    "net/http"
-    "strconv"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
+	"time"
 
-    "github.com/gorilla/mux"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 type Run struct {
-	RunNumber int `json:"runNumber"`
-	CarNumber int `json:"carNumber"`
-	RawTime  int `json:"rawTime"`
-	PaxTime  int `json:"paxTime"`
-	Class   string `json:"class"`
-	Name   string `json:"name"`
-	Cones   int `json:"cones"`
+	EventId     string `json:"eventId" db:"event_id"`
+	RunNumber   int    `json:"runNumber,string" db:"run_number"`
+	CarNumber   string `json:"carNumber" db:"car_number"`
+	RawTime     string `json:"rawTime" db:"raw_time"`
+	PaxTime     string `json:"paxTime" db:"pax_time"`
+	CarClass    string `json:"carClass" db:"car_class"`
+	DriverName  string `json:"driverName" db:"driver_name"`
+	Cones       int    `json:"cones,string" db:"cones"`
+	LastUpdated int    `json:"lastUpdated" db:"last_updated"`
+	Created     int    `json:"created" db:"created"`
 }
 
-var runs []Run
-
-func getRuns(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
-
-	if len(runs) == 0 {
-		http.Error(w, "No runs", http.StatusNotFound)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(runs)
+type Event struct {
+	EventId       string `json:"eventId" db:"event_id"`
+	ClubName      string `json:"clubName" db:"club_name"`
+	EventLocation string `json:"eventLocation" db:"event_location"`
+	EventDate     string `json:"eventDate" db:"event_date"`
+	EventNumber   int    `json:"eventNumber,string" db:"event_number"`
 }
 
-func getNewRuns(w http.ResponseWriter, r *http.Request) {
+var db *sqlx.DB
+var BASE_URL = os.Getenv("BASE_URL")
+
+func getRuns_sql(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
 	params := mux.Vars(r)
-	LastRunNumber, err := strconv.Atoi(params["LastRunNumber"])
-	if err != nil {
-		http.Error(w, "Get new runs error", http.StatusBadRequest)
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
 		return
 	}
 
 	var newRuns []Run
 
-	for _, run := range runs {
-		if run.RunNumber > LastRunNumber {
-			newRuns = append(newRuns, run)
-		}
+	err := db.Select(&newRuns, "SELECT * FROM runs WHERE event_id = ? ORDER BY run_number DESC", EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get runs error", http.StatusInternalServerError)
+		return
+	}
+
+	if len(newRuns) == 0 {
+		http.Error(w, "No runs found for event", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(newRuns)
+}
+
+func getNewRuns_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	LastUpdated, err := strconv.Atoi(params["LastUpdated"])
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get last updated error", http.StatusBadRequest)
+		return
+	}
+
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	var newRuns []Run
+
+	err = db.Select(&newRuns, "SELECT * FROM runs WHERE last_updated > ? AND event_id = ? ORDER BY run_number DESC", LastUpdated, EventId)
+	if err != nil {
+		log.Println("new runs error")
+		log.Println(err)
+		http.Error(w, "Get new runs error", http.StatusInternalServerError)
+		return
 	}
 
 	if len(newRuns) == 0 {
@@ -61,7 +104,7 @@ func getNewRuns(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(newRuns)
 }
 
-func getRun(w http.ResponseWriter, r *http.Request) {
+func getRun_sql(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
 	params := mux.Vars(r)
@@ -72,33 +115,52 @@ func getRun(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, item := range runs {
-		if item.RunNumber == RunNumber {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(item)
-			return
-		}
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
 	}
-	http.Error(w, "Run not found", http.StatusNotFound)
+
+	var run Run
+
+	err = db.Get(&run, "SELECT * FROM runs WHERE run_number = ? AND event_id = ?", RunNumber, EventId)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		http.Error(w, "No run found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.Println(err)
+		http.Error(w, "Get run error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(run)
 }
 
-func getCarsRuns(w http.ResponseWriter, r *http.Request) {
+func getCarsRuns_sql(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
 
 	params := mux.Vars(r)
 
 	CarNumber, err := strconv.Atoi(params["CarNumber"])
 	if err != nil {
-		http.Error(w, "Get car runs error", http.StatusBadRequest)
+		http.Error(w, "Missing car number", http.StatusBadRequest)
+		return
+	}
+
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
 		return
 	}
 
 	var carRuns []Run
 
-	for _, run := range runs {
-		if run.CarNumber == CarNumber {
-			carRuns = append(carRuns, run)
-		}
+	err = db.Select(&carRuns, "SELECT * FROM runs WHERE car_number = ? AND event_id = ?", CarNumber, EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get cars runs error", http.StatusInternalServerError)
+		return
 	}
 
 	if len(carRuns) == 0 {
@@ -110,41 +172,271 @@ func getCarsRuns(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(carRuns)
 }
 
-func createRun(w http.ResponseWriter, r *http.Request) {
+func createRun_sql(w http.ResponseWriter, r *http.Request) {
 	enableCors(&w)
+	params := mux.Vars(r)
+
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
 
 	var run Run
 	_ = json.NewDecoder(r.Body).Decode(&run)
 
+	run.EventId = EventId
+
 	log.Println(run)
 
-	if run.RunNumber == 0 {
-		http.Error(w, "Run number is required", http.StatusBadRequest)
+	createTime := int(time.Now().Unix())
+
+	run.LastUpdated = createTime
+	run.Created = createTime
+
+	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :last_updated, :created)", run)
+	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
+		log.Println("Run already exists")
+		http.Error(w, "Run already exists", http.StatusInternalServerError)
+		return
+	} else if err != nil {
+		log.Println(err)
+		http.Error(w, "Insert event error", http.StatusInternalServerError)
 		return
 	}
 
-	runs = append(runs, run)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(run)
 }
 
+func deleteRun_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	RunNumber, err := strconv.Atoi(params["RunNumber"])
+	if err != nil {
+		http.Error(w, "Missing run number", http.StatusBadRequest)
+		return
+	}
+
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	_, err = db.Exec("DELETE FROM runs WHERE run_number = ? AND event_id = ?", RunNumber, EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Delete run error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode("Run deleted")
+}
+
+// todo: sql, and fully implement
+func updateRun(w http.ResponseWriter, r *http.Request) {
+	/*enableCors(&w)
+
+	params := mux.Vars(r)
+
+	var updatedRun Run
+	_ = json.NewDecoder(r.Body).Decode(&updatedRun)
+
+	log.Println(updatedRun)
+
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	if updatedRun.RunNumber == 0 {
+		http.Error(w, "Run number is required", http.StatusBadRequest)
+		return
+	}
+
+	for _, run := range runs {
+		if run.RunNumber == updatedRun.RunNumber && run.EventId == EventId {
+			updatedRun.LastUpdated = int(time.Now().Unix())
+			updatedRun.Created = run.Created
+			run = updatedRun
+		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updatedRun)*/
+}
+
+func getEvent_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+
+	EventId := params["EventId"]
+
+	var event Event
+
+	err := db.Get(&event, "SELECT * FROM events WHERE event_id = ?", EventId)
+	if err != nil && err.Error() == "sql: no rows in result set" {
+		http.Error(w, "Event not found", http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.Println(err)
+		http.Error(w, "Get event error", http.StatusInternalServerError)
+		return
+	}
+
+	if event.EventId == EventId {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(event)
+		return
+	}
+
+	http.Error(w, "Event not found", http.StatusNotFound)
+}
+
+func getEvents_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	var events_list []Event
+
+	err := db.Select(&events_list, "SELECT * FROM events ORDER BY event_date DESC")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get events error", http.StatusInternalServerError)
+		return
+	}
+
+	if len(events_list) == 0 {
+		http.Error(w, "No events found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(events_list)
+}
+
+func createEvent_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	var event Event
+	_ = json.NewDecoder(r.Body).Decode(&event)
+
+	log.Println(event)
+
+	u := uuid.New()
+	event.EventId = u.String()
+
+	_, err := db.NamedExec("INSERT INTO events (event_id, club_name, event_location, event_date, event_number) VALUES (:event_id, :club_name, :event_location, :event_date, :event_number)", event)
+
+	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
+		log.Println("Event already exists")
+		http.Error(w, "Event already exists", http.StatusInternalServerError)
+		return
+	} else if err != nil {
+		log.Println(err)
+		http.Error(w, "Insert event error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(event)
+}
+
+func deleteEvent_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	_, err := db.Exec("DELETE FROM events WHERE event_id = ?", EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Delete event error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode("Event deleted")
+}
+
+func getLeaderboardRuns_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	var leaderboardRuns []Run
+
+	err := db.Select(&leaderboardRuns, "SELECT * FROM runs WHERE pax_time > 0 AND event_id = ?", EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Insert event error", http.StatusInternalServerError)
+		return
+	}
+
+	if len(leaderboardRuns) == 0 {
+		http.Error(w, "Leaderboard runs not found", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(leaderboardRuns)
+}
+
 func enableCors(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+	(*w).Header().Set("Access-Control-Allow-Origin", BASE_URL)
 }
 
 func main() {
 
-	runs = append(runs, Run{RunNumber: 1, CarNumber: 1, RawTime: 100, PaxTime: 90, Class: "A Street", Name: "John Doe", Cones: 0})
-	runs = append(runs, Run{RunNumber: 2, CarNumber: 16, RawTime: 98, PaxTime: 85, Class: "B Street", Name: "Jared Kelly", Cones: 2})
+	DB_PASSWORD, err := os.ReadFile("/run/secrets/DB_PASSWORD")
+	if err != nil {
+		log.Fatalln("DB password not found")
+	}
+	CONNECTION_STRING := fmt.Sprintf("autocross:%s@tcp(db:3306)/autocross", DB_PASSWORD)
+
+	retries := 0
+
+	for retries < 10 {
+		db, err = sqlx.Connect("mysql", CONNECTION_STRING)
+		if err == nil {
+			break
+		} else if retries == 4 {
+			log.Fatalln(err)
+		} else {
+			retries++
+			time.Sleep(5 * time.Second)
+		}
+	}
+
+	log.Println("Connected to database")
 
 	r := mux.NewRouter()
-
-	r.HandleFunc("/runs/", getRuns).Methods("GET")
-	r.HandleFunc("/runs/{LastRunNumber}", getNewRuns).Methods("GET")
-	r.HandleFunc("/run/{RunNumber}", getRun).Methods("GET")
-	r.HandleFunc("/runs", createRun).Methods("POST")
-	r.HandleFunc("/car/{CarNumber}", getCarsRuns).Methods("GET")
+	r.HandleFunc("/runs/{EventId}/", getRuns_sql).Methods("GET")
+	r.HandleFunc("/runs/{EventId}/{LastUpdated}", getNewRuns_sql).Methods("GET")
+	r.HandleFunc("/run/{EventId}/{RunNumber}", getRun_sql).Methods("GET")
+	r.HandleFunc("/runs/{EventId}", createRun_sql).Methods("POST")
+	r.HandleFunc("/runs/{EventId}/{RunNumber}", updateRun).Methods("POST")
+	r.HandleFunc("/car/{EventId}/{CarNumber}", getCarsRuns_sql).Methods("GET")
+	r.HandleFunc("/runs/leaderboard/{EventId}/", getLeaderboardRuns_sql).Methods("GET")
+	r.HandleFunc("/event/{EventId}", getEvent_sql).Methods("GET")
+	r.HandleFunc("/events/", getEvents_sql).Methods("GET")
+	r.HandleFunc("/events", createEvent_sql).Methods("POST")
+	r.HandleFunc("/event/delete/{EventId}", deleteEvent_sql).Methods("GET")
+	r.HandleFunc("/run/delete/{EventId}/{RunNumber}", deleteRun_sql).Methods("GET")
 
 	fmt.Println("Server is running on port 8000...")
-    log.Fatal(http.ListenAndServe(":8000", r))
+	log.Fatal(http.ListenAndServe(":8000", r))
 }

@@ -11,16 +11,22 @@
     import DisplayRun from '../components/DisplayRuns.vue';
     import { ref } from 'vue';
     import { useInterval } from './useInterval.js';
-    import { getAllRuns, getClass } from '../components/apiHandler.js';
+    import { getAllRuns, getClass, getLeaderboardRuns } from '../components/apiHandler.js';
 
-    const props = defineProps(['sortType', 'filterClass']);
+    const props = defineProps(['sortType', 'filterClass', 'leaderboard']);
 
     const runs = ref([]);
 
     updateRuns(); 
     
     function updateRuns() {
-        if(!props.filterClass) {
+        if(props.leaderboard){
+            getLeaderboardRuns()
+            .then(data => {
+                runs.value = data
+            });
+        }
+        else if(!props.filterClass) {
             getAllRuns()
             .then(data => {
                 runs.value = data
@@ -31,7 +37,7 @@
             .then(data => {
                 runs.value = data
             });
-        }
+        };
     };
     
     useInterval(updateRuns);    

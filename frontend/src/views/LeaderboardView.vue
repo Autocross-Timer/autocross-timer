@@ -20,7 +20,7 @@
 <template>
     <RouterLink :to="'/leaderboard/pax'" class="link-container">PAX</RouterLink>
     <RouterLink :to="'/leaderboard/raw'" class="link-container">Raw</RouterLink>
-    <GetRun :sortType="sortType" />
+    <GetRun :sortType="sortType" :leaderboard="true" />
 </template>
 
 <style scoped>

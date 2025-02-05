@@ -1,0 +1,45 @@
+services:
+  api:
+    build: ./backend
+    depends_on:
+      - db
+    expose:
+      - 8000
+    ports:
+      - 8000:8000
+    networks:
+      - frontend
+      - backend
+    environment:
+      - BASE_URL=${BASE_URL}
+    secrets:
+      - DB_PASSWORD
+  db:
+    image: mysql
+    restart: always
+    networks:
+      - backend
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: yes
+      MYSQL_ONETIME_PASSWORD: yes
+      MYSQL_DATABASE: autocross
+      MYSQL_USER: autocross
+      MYSQL_PASSWORD_FILE: /run/secrets/DB_PASSWORD
+    expose:
+      - 3306
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./data/sql:/docker-entrypoint-initdb.d
+    secrets:
+      - DB_PASSWORD
+
+networks:
+  frontend:
+  backend:
+
+secrets:
+  DB_PASSWORD:
+    environment: "DB_PASSWORD"
+
+volumes:
+  db_data:

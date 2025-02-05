@@ -26,13 +26,13 @@
         <div v-if="displayType==='individual-car'">
             <p v-for="(run, index) in runs" :key="runs.runNumber">
                 <span id="run-number">{{ index+1 }}</span>
-                <span id="run-name">{{ run.name }}</span>
+                <span id="run-name">{{ run.driverName }}</span>
                 <span class="right">
                     <span v-if="run.cones" id="run-cones">+{{ run.cones }}</span>
                     <span id="run-paxtime">{{ run.paxTime }}</span>
                 </span>
                 <br/>
-                <span id="run-class">{{ run.class }}</span>
+                <span id="run-class">{{ run.carClass }}</span>
                 <span id="run-car-number">#{{ run.carNumber }}</span>
                 <span class="right">
                     <span id="run-rawtime">({{ run.rawTime }})</span>
@@ -44,14 +44,14 @@
                 <RouterLink :to="'/car/' + run.carNumber" class="link-container">
                     <span v-if="sortType" id="run-number">{{ index+1 }}</span>
                     <span v-else id="run-number">{{ run.runNumber }}</span>
-                    <span id="run-name">{{ run.name }}</span>
+                    <span id="run-name">{{ run.driverName }}</span>
                     <span class="right">
                         <span v-if="run.cones" id="run-cones">+{{ run.cones }}</span>
                         <span v-if="sortType==='raw'" id="run-rawtime">{{ run.rawTime }}</span>
                         <span v-else id="run-paxtime">{{ run.paxTime }}</span>
                     </span>
                     <br/>
-                    <span id="run-class">{{ run.class }}</span>
+                    <span id="run-class">{{ run.carClass }}</span>
                     <span id="run-car-number">#{{ run.carNumber }}</span>
                     <span class="right">
                         <span v-if="sortType==='raw'" id="run-paxtime">({{ run.paxTime }})</span>

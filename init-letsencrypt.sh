@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains="live.jaredkelly.ca"
+domains=$BASE_URL
 rsa_key_size=4096
 data_path="/home/ec2-user/cert-data/certbot"
 email="certs@jaredkelly.ca" # Adding a valid address is strongly recommended
