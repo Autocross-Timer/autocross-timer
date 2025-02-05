@@ -24,6 +24,9 @@ services:
       - DB_PASSWORD
   nginx:
     image: nginx:alpine
+    depends_on:
+      - api
+      - web
     ports:
       - 80:80
       - 443:443

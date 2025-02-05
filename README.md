@@ -49,3 +49,4 @@ It is very simple to deploy this project. Configure all of the variables above, 
 - Add class leaderboards
 - Fix raw time leaderboard
 - Add "get new runs" functionality to front end
+- Add Docker health checks to web and API
