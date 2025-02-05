@@ -7,6 +7,8 @@ services:
       - 80
     networks:
       - frontend
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
   api:
     build: ./backend
     depends_on:
@@ -17,7 +19,7 @@ services:
       - frontend
       - backend
     environment:
-      - VITE_BASE_URL=${BASE_URL}
+      - BASE_URL=${BASE_URL}
     secrets:
       - DB_PASSWORD
   nginx:
