@@ -4,6 +4,7 @@ services:
       context: ./frontend
       args:
         - VITE_API_URL=${VITE_API_URL}
+    restart: unless-stopped
     depends_on:
       - api
     expose: 
@@ -14,6 +15,7 @@ services:
       - VITE_API_URL=${VITE_API_URL}
   api:
     build: ./backend
+    restart: unless-stopped
     depends_on:
       - db
     expose:
@@ -25,34 +27,27 @@ services:
       - BASE_URL=${BASE_URL}
     secrets:
       - DB_PASSWORD
-  nginx:
-    image: nginx:alpine
+  caddy:
+    image: caddy:2.9-alpine
+    restart: unless-stopped
     depends_on:
       - api
       - web
     ports:
       - 80:80
       - 443:443
+      - 443:443/udp
     networks:
       - frontend
     volumes:
-      - ~/cert-data/prod/nginx:/etc/nginx/conf.d
-      - ~/cert-data/certbot/conf:/etc/letsencrypt
-      - ~/cert-data/certbot/www:/var/www/certbot
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-  certbot:
-    image: certbot/certbot
-    networks:
-      - frontend
+      - ./data/prod/Caddy:/etc/caddy
+      - caddy_data:/data
+      - caddy_config:/config
     environment:
       - BASE_URL=${BASE_URL}
-    volumes:
-      - ~/cert-data/certbot/conf:/etc/letsencrypt
-      - ~/cert-data/certbot/www:/var/www/certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
   db:
-    image: mysql
-    restart: always
+    image: mysql:9.2
+    restart: unless-stopped
     networks:
       - backend
     environment:
@@ -77,3 +72,5 @@ secrets:
 
 volumes:
   db_data:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,6 @@
+http://live.jaredkelly.ca {
+	root * /srv
+	encode gzip
+	try_files {path} /
+	file_server
+}

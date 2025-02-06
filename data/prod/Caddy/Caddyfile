@@ -1,0 +1,4 @@
+{$BASE_URL:localhost} {
+    reverse_proxy /api* http://api:8000
+    reverse_proxy http://web:80
+}
