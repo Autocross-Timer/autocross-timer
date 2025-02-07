@@ -395,6 +395,11 @@ func getLeaderboardRuns_sql(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(leaderboardRuns)
 }
 
+func notFound(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL)
+	http.Error(w, "404 page not found", http.StatusNotFound)
+}
+
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", BASE_URL)
 }
@@ -424,6 +429,7 @@ func main() {
 	log.Println("Connected to database")
 
 	r := mux.NewRouter()
+	r.NotFoundHandler = http.HandlerFunc(notFound)
 	r.HandleFunc("/api/runs/{EventId}/", getRuns_sql).Methods("GET")
 	r.HandleFunc("/api/runs/{EventId}/{LastUpdated}", getNewRuns_sql).Methods("GET")
 	r.HandleFunc("/api/run/{EventId}/{RunNumber}", getRun_sql).Methods("GET")
