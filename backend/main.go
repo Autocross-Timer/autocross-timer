@@ -400,6 +400,11 @@ func notFound(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "404 page not found", http.StatusNotFound)
 }
 
+func optionsCors(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+}
+
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", BASE_URL)
 }
@@ -434,12 +439,15 @@ func main() {
 	r.HandleFunc("/api/runs/{EventId}/{LastUpdated}", getNewRuns_sql).Methods("GET")
 	r.HandleFunc("/api/run/{EventId}/{RunNumber}", getRun_sql).Methods("GET")
 	r.HandleFunc("/api/runs/{EventId}", createRun_sql).Methods("POST")
+	r.HandleFunc("/api/runs/{EventId}", optionsCors).Methods("OPTIONS")
 	r.HandleFunc("/api/runs/{EventId}/{RunNumber}", updateRun).Methods("POST")
+	r.HandleFunc("/api/runs/{EventId}/{RunNumber}", optionsCors).Methods("OPTIONS")
 	r.HandleFunc("/api/car/{EventId}/{CarNumber}", getCarsRuns_sql).Methods("GET")
 	r.HandleFunc("/api/runs/leaderboard/{EventId}/", getLeaderboardRuns_sql).Methods("GET")
 	r.HandleFunc("/api/event/{EventId}", getEvent_sql).Methods("GET")
 	r.HandleFunc("/api/events/", getEvents_sql).Methods("GET")
 	r.HandleFunc("/api/events", createEvent_sql).Methods("POST")
+	r.HandleFunc("/api/events", optionsCors).Methods("OPTIONS")
 	r.HandleFunc("/api/event/delete/{EventId}", deleteEvent_sql).Methods("GET")
 	r.HandleFunc("/api/run/delete/{EventId}/{RunNumber}", deleteRun_sql).Methods("GET")
 
