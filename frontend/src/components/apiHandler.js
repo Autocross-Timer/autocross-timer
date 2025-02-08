@@ -42,8 +42,7 @@ export function createEvent(event) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(event),
-        mode: 'no-cors'
+        body: JSON.stringify(event)
     })
 }
 
@@ -53,8 +52,7 @@ export function createRun(run, eventId){
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(run),
-        mode: 'no-cors'
+        body: JSON.stringify(run)
     })
 }
 
