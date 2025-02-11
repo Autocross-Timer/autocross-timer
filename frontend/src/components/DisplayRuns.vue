@@ -1,15 +1,15 @@
 <script setup>
+    import { RouterLink } from 'vue-router';
+    
     const props = defineProps(['runs', 'displayType', 'sortType']);
 
     function sort(runs, sortType){
         if(sortType === "raw"){
             const newRuns = [].slice.call(runs).sort((a, b) => a.rawTime - b.rawTime);
-            console.log(newRuns);
             return newRuns;
         }
         else if(sortType === "pax"){
             const newRuns = [].slice.call(runs).sort((a, b) => a.paxTime - b.paxTime);
-            console.log(newRuns);
             return newRuns;
         }
         else {
@@ -24,7 +24,7 @@
     </div>
     <div v-if="runs" class="content">
         <div v-if="displayType==='individual-car'">
-            <p v-for="(run, index) in runs" :key="runs.runNumber">
+            <p class="run-container" v-for="(run, index) in runs" :key="runs.runNumber">
                 <span id="run-number">{{ index+1 }}</span>
                 <span id="run-name">{{ run.driverName }}</span>
                 <span class="right">
@@ -40,8 +40,8 @@
             </p>
         </div>
         <div v-else>
-            <p v-for="(run, index) in sort(runs, sortType)" :key="runs.runNumber">
-                <RouterLink :to="'/car/' + run.carNumber" class="link-container">
+            <p v-for="(run, index) in sort(runs, sortType)" :key="sortType">
+                <RouterLink :to="'/event/' + run.eventId + '/car/' + run.carNumber" class="link-container">
                     <span v-if="sortType" id="run-number">{{ index+1 }}</span>
                     <span v-else id="run-number">{{ run.runNumber }}</span>
                     <span id="run-name">{{ run.driverName }}</span>
@@ -68,10 +68,12 @@
         padding: 0px 5px 0px 5px;
         align-items: center;
         border: solid red 2px;
+        color: white;
     }
 
     #run-name {
         padding-left: 10px;
+        color: white;
     }
 
     .right {
@@ -87,9 +89,12 @@
         padding-right: 10px;
     }
 
-    .link-container {
+    .link-container, .run-container {
         display: block;
         text-decoration: none; /* Remove default underline */
         color: inherit; /* Inherit text color */
+        border-style: solid;
+        border-width: 0 0 1px 0;
+        padding-top: 5px;
     }
 </style>

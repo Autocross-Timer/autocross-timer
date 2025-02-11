@@ -1,6 +1,6 @@
 <template>
     <div v-if="!runs" class="text-center">
-        <div class="spinner-border spinner-border-sm">loading</div>
+        <div class="spinner-border spinner-border-sm">There are no runs for this event.</div>
     </div>
     <div v-if="runs" class="content">
         <DisplayRun :runs="runs" :sortType="sortType"/>
@@ -8,32 +8,30 @@
 </template>
 
 <script setup>
-    import DisplayRun from '../components/DisplayRuns.vue';
-    import { ref } from 'vue';
+    import DisplayRun from './DisplayRuns.vue';
+    import { ref, watch } from 'vue';
     import { useInterval } from './useInterval.js';
-    import { getAllRuns, getClass, getLeaderboardRuns } from '../components/apiHandler.js';
+    import { getAllRuns, getClass, getLeaderboardRuns } from './apiHandler.js';
 
-    const props = defineProps(['sortType', 'filterClass', 'leaderboard']);
+    const props = defineProps(['sortType', 'filterClass', 'leaderboard', 'eventId']);
 
     const runs = ref([]);
-
-    updateRuns(); 
     
     function updateRuns() {
         if(props.leaderboard){
-            getLeaderboardRuns()
+            getLeaderboardRuns(props.eventId)
             .then(data => {
                 runs.value = data
             });
         }
         else if(!props.filterClass) {
-            getAllRuns()
+            getAllRuns(props.eventId)
             .then(data => {
                 runs.value = data
             });
         }
         else{
-            getClass(props.filterClass)
+            getClass(props.eventId, props.filterClass)
             .then(data => {
                 runs.value = data
             });

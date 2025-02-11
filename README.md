@@ -20,10 +20,6 @@ There are several variables that need to be set before you can run this in your 
 - `BASE_URL`: The base URL of the website. Used by the Go backend for CORS, and the `init-letsencrypt.sh` script for the SSL certificate.
 - `VITE_API_URL`: The API url. By default it will be `BASE_URL/api`, but if you've changed the API routing it may be different.
 
-### nginx config
-
-- `data/prod/nginx/default.conf`: the server name must be set with the base url
-
 ### Terraform config
 
 - `main.tf`
@@ -41,12 +37,14 @@ It is very simple to deploy this project. Configure all of the variables above, 
 
 ## TODO
 
-- Add base url variable support to nginx
 - Add Docker setup into Terraform config
 - Implement updateRun in the API backend
 - Add validation to API
-- Add multi-event support to front end
 - Add class leaderboards
-- Fix raw time leaderboard
+  - Add get event classes to backend
+- Fix duplicate keys in leaderboard
 - Add "get new runs" functionality to front end
+  - Store runs in local storage
 - Add Docker health checks to web and API
+- Make driver view card better
+- Make programatic run simulation

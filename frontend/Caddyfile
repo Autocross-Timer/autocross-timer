@@ -1,4 +1,4 @@
-http://live.jaredkelly.ca {
+:80 {
 	root * /srv
 	encode gzip
 	try_files {path} /

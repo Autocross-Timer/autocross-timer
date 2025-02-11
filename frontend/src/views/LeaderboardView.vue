@@ -2,13 +2,17 @@
   import { ref, watch } from 'vue';
   import GetRun from '../components/FetchRuns.vue'
   import { useRoute } from 'vue-router';
+  import NavLinks from '../components/NavLinks.vue';
 
   const sortType = ref('pax');
   const route = useRoute();
-  watch(() => route.params.sortClass, updateActiveButton(), {immediate: true});
+  const eventId = route.params.eventId;
+  watch(() => route.params.sortClass, (newSortClass) => {
+    updateActiveButton(newSortClass);
+  });
 
-  function updateActiveButton() {
-    if(route.params.sortClass === 'raw'){
+  function updateActiveButton(newSortClass) {
+    if(newSortClass === 'raw'){
       sortType.value = 'raw';
     }
     else{
@@ -18,9 +22,10 @@
 </script>
 
 <template>
-    <RouterLink :to="'/leaderboard/pax'" class="link-container">PAX</RouterLink>
-    <RouterLink :to="'/leaderboard/raw'" class="link-container">Raw</RouterLink>
-    <GetRun :sortType="sortType" :leaderboard="true" />
+    <NavLinks />
+    <RouterLink :to="'/event/' + eventId + '/leaderboard/pax'" class="link-container">PAX</RouterLink>
+    <RouterLink :to="'/event/' + eventId + '/leaderboard/raw'" class="link-container">Raw</RouterLink>
+    <GetRun :sortType="sortType" :leaderboard="true" :eventId="eventId"/>
 </template>
 
 <style scoped>
@@ -34,7 +39,6 @@
   }
 
   .link-container {
-    display: block;
     text-decoration: none; /* Remove default underline */
     color: inherit; /* Inherit text color */
   }

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import EventsView from '../views/EventsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,30 +7,32 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: EventsView,
     },
     {
-      path: '/leaderboard',
-      redirect: '/leaderboard/pax'
+      path: '/event/:eventId',
+      name: 'event',
+      component: () => import('../views/EventView.vue'),
     },
     {
-      path: '/leaderboard/:sortClass',
+      path: '/event/:eventId/leaderboard/:sortClass',
       name: 'leaderboard',
       component: () => import('../views/LeaderboardView.vue'),
     },
     {
-      path: '/watchlist',
-      name: 'watchlist',
-      component: () => import('../views/WatchlistView.vue'),
+      path: '/event/:eventId/leaderboard/',
+      name: 'leaderboard-redirect',
+      component: () => import('../views/LeaderboardView.vue'),
     },
     {
-      path: '/car/:carId',
+      path: '/event/:eventId/car/:carId',
       name: 'car',
       component: () => import('../views/CarView.vue'),
-    },
+    },    
     {
-      path: '/car',
-      redirect: '/'
+      path: '/event/:eventId/watchlist',
+      name: 'watchlist',
+      component: () => import('../views/WatchlistView.vue'),
     },
     {
       path: '/admin',

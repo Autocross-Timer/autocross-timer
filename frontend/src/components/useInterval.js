@@ -5,6 +5,7 @@ export function useInterval(callback, time=10000) {
 
     function start() {
         stop();
+        callback();
         timer = setInterval(callback, time);
     }
 

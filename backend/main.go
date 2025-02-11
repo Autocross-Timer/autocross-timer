@@ -329,6 +329,7 @@ func createEvent_sql(w http.ResponseWriter, r *http.Request) {
 
 	u := uuid.New()
 	event.EventId = u.String()
+	log.Println(event)
 
 	_, err := db.NamedExec("INSERT INTO events (event_id, club_name, event_location, event_date, event_number) VALUES (:event_id, :club_name, :event_location, :event_date, :event_number)", event)
 

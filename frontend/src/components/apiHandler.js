@@ -1,28 +1,32 @@
 const API_URL = import.meta.env.VITE_API_URL;
-const event_id = 1;
 
-export function getAllRuns() {
-    return fetch(`${API_URL}/runs/${event_id}/`)
+export function getAllRuns(eventId) {
+    return fetch(`${API_URL}/runs/${eventId}/`)
         .then(response => response.json())
 };
 
-export function getLeaderboardRuns() {
-    return fetch(`${API_URL}/runs/leaderboard/${event_id}/`)
+export function getLeaderboardRuns(eventId) {
+    return fetch(`${API_URL}/runs/leaderboard/${eventId}/`)
         .then(response => response.json())
 }
 
-export function getRun(run_number) {
-    return fetch(`${API_URL}/runs/${event_id}/${run_number}/`)
+export function getRun(eventId, run_number) {
+    return fetch(`${API_URL}/runs/${eventId}/${run_number}/`)
         .then(response => response.json())
 };
 
-export function getCarRuns(car_number) {
-    return fetch(`${API_URL}/car/${event_id}/${car_number}`)
+export function getCarRuns(eventId, car_number) {
+    return fetch(`${API_URL}/car/${eventId}/${car_number}`)
         .then(response => response.json())
 }
 
-export function getClass(class_name) {
-    return fetch(`${API_URL}/class/${event_id}/${class_name}`)
+export function getClass(eventId, class_name) {
+    return fetch(`${API_URL}/class/${eventId}/${class_name}`)
+        .then(response => response.json())
+}
+
+export function getClasses(eventId) {
+    return fetch(`${API_URL}/classes/${eventId}`)
         .then(response => response.json())
 }
 
@@ -31,8 +35,8 @@ export function getEvents() {
         .then(response => response.json())
 }
 
-export function getEvent(event_id) {
-    return fetch(`${API_URL}/events/${event_id}/`)
+export function getEvent(eventId) {
+    return fetch(`${API_URL}/events/${eventId}/`)
         .then(response => response.json())
 }
 
@@ -42,7 +46,8 @@ export function createEvent(event) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(event)
+        body: JSON.stringify(event),
+        mode: 'no-cors'
     })
 }
 
@@ -52,7 +57,8 @@ export function createRun(run, eventId){
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(run)
+        body: JSON.stringify(run),
+        mode: 'no-cors'
     })
 }
 

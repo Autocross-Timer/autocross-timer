@@ -1,18 +1,11 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
   <header>
     <div class="wrapper">
-      <HelloWorld msg="Live Timing" />
-
-      <nav>
-        <RouterLink to="/">Runs</RouterLink>
-        <RouterLink to="/leaderboard">Leaderboard</RouterLink>
-        <RouterLink to="/watchlist">Watch List</RouterLink>
-      </nav>
+      <RouterLink to="/" class="no-decoration"><h1 class="title green">Live Timing</h1></RouterLink>
     </div>
   </header>
 
@@ -25,60 +18,26 @@ header {
   max-height: 100vh;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.title {
+  margin: 0;
+  padding: 0;
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+h1 {
+  font-weight: 500;
+  font-size: 2.6rem;
+  position: absolute;
+  top: -10px;
+  left: 10px;
 }
 
-nav a.router-link-exact-active {
-  color: var(--color-text);
+.wrapper {
+  padding-bottom: 10px;
 }
 
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
+.no-decoration {
+  all: unset;
+  cursor: pointer;
 }
 
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
 </style>
