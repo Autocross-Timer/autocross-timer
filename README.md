@@ -48,3 +48,4 @@ It is very simple to deploy this project. Configure all of the variables above, 
 - Add Docker health checks to web and API
 - Make driver view card better
 - Make programatic run simulation
+- Go through CSS
