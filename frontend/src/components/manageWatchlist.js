@@ -2,11 +2,11 @@ export function addCar(eventId, carNumber){
     //console.log("Adding car " + carNumber + " from event " + eventId);
     var retString = localStorage.getItem(eventId);
     var retArray = JSON.parse(retString);
-    if(retArray.includes(carNumber)){
-        return;
-    }
     if (retArray == null){
         retArray = [];
+    }
+    if(retArray.includes(carNumber)){
+        return;
     }
     retArray.push(carNumber);
     localStorage.setItem(eventId, JSON.stringify(retArray));
