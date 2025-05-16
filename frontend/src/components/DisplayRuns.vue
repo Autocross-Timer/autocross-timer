@@ -64,18 +64,6 @@
 </template>
 
 <style scoped>
-    #run-number {
-        padding: 0px 5px 0px 5px;
-        align-items: center;
-        border: solid red 2px;
-        color: white;
-    }
-
-    #run-name {
-        padding-left: 10px;
-        color: white;
-    }
-
     .right {
         float: right;
     }

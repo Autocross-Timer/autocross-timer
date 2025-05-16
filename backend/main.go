@@ -327,9 +327,14 @@ func createEvent_sql(w http.ResponseWriter, r *http.Request) {
 
 	log.Println(event)
 
-	u := uuid.New()
-	event.EventId = u.String()
-	log.Println(event)
+	if event.EventId == "random" {
+		log.Println("Generating random event ID")
+		u := uuid.New()
+		event.EventId = u.String()
+		log.Println(event)
+	} else {
+		log.Println("Using provided event ID")
+	}
 
 	_, err := db.NamedExec("INSERT INTO events (event_id, club_name, event_location, event_date, event_number) VALUES (:event_id, :club_name, :event_location, :event_date, :event_number)", event)
 
