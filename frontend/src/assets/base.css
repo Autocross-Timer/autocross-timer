@@ -36,6 +36,18 @@
   --section-gap: 160px;
 }
 
+.run-number {
+  padding: 0px 5px 0px 5px;
+  align-items: center;
+  border: solid red 2px;
+  color: black;
+}
+
+.run-name {
+  padding-left: 10px;
+  color: black;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --color-background: var(--vt-c-black);
@@ -91,18 +103,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-.run-number {
-  padding: 0px 5px 0px 5px;
-  align-items: center;
-  border: solid red 2px;
-  color: black;
-}
-
-.run-name {
-  padding-left: 10px;
-  color: black;
 }
 
 .right {
