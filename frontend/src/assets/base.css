@@ -50,15 +50,11 @@
   }
 
   #run-number {
-    padding: 0px 5px 0px 5px;
-    align-items: center;
-    border: solid red 2px;
-    color: white;
+    --color-text: white;
   }
   
   #run-name {
-    padding-left: 10px;
-    color: white;
+    --color-text: white;
   }
 }
 
