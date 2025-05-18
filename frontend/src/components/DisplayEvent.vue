@@ -16,29 +16,6 @@
 </template>
 
 <style scoped>
-    #run-number {
-        padding: 0px 5px 0px 5px;
-        align-items: center;
-        border: solid red 2px;
-    }
-
-    #run-name {
-        padding-left: 10px;
-    }
-
-    .right {
-        float: right;
-    }
-
-    #run-cones {
-        color: red;
-        padding-right: 10px;
-    }
-
-    #run-class {
-        padding-right: 10px;
-    }
-
     .link-container {
         display: block;
         text-decoration: none; /* Remove default underline */

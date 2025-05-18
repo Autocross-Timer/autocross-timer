@@ -49,12 +49,12 @@
     --color-text: var(--vt-c-text-dark-2);
   }
 
-  #run-number {
-    --color-text: white;
+  .run-number {
+    color: white;
   }
   
-  #run-name {
-    --color-text: white;
+  .run-name {
+    color: white;
   }
 }
 
@@ -93,14 +93,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-#run-number {
+.run-number {
   padding: 0px 5px 0px 5px;
   align-items: center;
   border: solid red 2px;
   color: black;
 }
 
-#run-name {
+.run-name {
   padding-left: 10px;
   color: black;
+}
+
+.right {
+  float: right;
 }
