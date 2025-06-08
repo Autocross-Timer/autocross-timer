@@ -26,7 +26,7 @@ export function getClass(eventId, class_name) {
 }
 
 export function getClasses(eventId) {
-    return fetch(`${API_URL}/classes/${eventId}`)
+    return fetch(`${API_URL}/class/${eventId}`)
         .then(response => response.json())
 }
 

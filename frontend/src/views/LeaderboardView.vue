@@ -3,10 +3,12 @@
   import GetRun from '../components/FetchRuns.vue'
   import { useRoute } from 'vue-router';
   import NavLinks from '../components/NavLinks.vue';
+  import { getClasses } from '../components/apiHandler.js';
 
   const sortType = ref('pax');
   const route = useRoute();
   const eventId = route.params.eventId;
+  const classes = ref(null)
   watch(() => route.params.sortClass, (newSortClass) => {
     updateActiveButton(newSortClass);
   });
@@ -19,12 +21,18 @@
       sortType.value = 'pax';
     }
   }
+
+  getClasses(eventId)
+    .then(data => {
+      classes.value = data;
+  });
 </script>
 
 <template>
     <NavLinks />
     <RouterLink :to="'/event/' + eventId + '/leaderboard/pax'" class="link-container">PAX</RouterLink>
     <RouterLink :to="'/event/' + eventId + '/leaderboard/raw'" class="link-container">Raw</RouterLink>
+    <RouterLink v-for="carClass in classes" :to="'/event/' + eventId + '/leaderboard/' + carClass.carClass" class="link-container">{{ carClass.carClass }}</RouterLink>
     <GetRun :sortType="sortType" :leaderboard="true" :eventId="eventId"/>
 </template>
 

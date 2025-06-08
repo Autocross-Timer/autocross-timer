@@ -403,6 +403,64 @@ func getLeaderboardRuns_sql(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(leaderboardRuns)
 }
 
+func getEventClasses_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	EventId := params["EventId"]
+	if EventId == "" {
+		http.Error(w, "Missing event ID", http.StatusBadRequest)
+		return
+	}
+
+	var classes []string
+
+	err := db.Select(&classes, "SELECT DISTINCT car_class FROM runs WHERE event_id = ? AND car_class IS NOT NULL AND car_class != '' ORDER BY car_class", EventId)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get event classes error", http.StatusInternalServerError)
+		return
+	}
+
+	if len(classes) == 0 {
+		http.Error(w, "No classes found for event", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(classes)
+}
+
+func getClass_sql(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+
+	params := mux.Vars(r)
+	EventId := params["EventId"]
+	ClassName := params["ClassName"]
+
+	if EventId == "" || ClassName == "" {
+		http.Error(w, "Missing event ID or class name", http.StatusBadRequest)
+		return
+	}
+
+	var classRuns []Run
+
+	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND car_class = ? ORDER BY pax_time ASC", EventId, ClassName)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Get class runs error", http.StatusInternalServerError)
+		return
+	}
+
+	if len(classRuns) == 0 {
+		http.Error(w, "No runs found for class", http.StatusNotFound)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(classRuns)
+}
+
 func notFound(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL)
 	http.Error(w, "404 page not found", http.StatusNotFound)
@@ -453,6 +511,8 @@ func main() {
 	r.HandleFunc("/api/car/{EventId}/{CarNumber}", getCarsRuns_sql).Methods("GET")
 	r.HandleFunc("/api/runs/leaderboard/{EventId}/", getLeaderboardRuns_sql).Methods("GET")
 	r.HandleFunc("/api/event/{EventId}", getEvent_sql).Methods("GET")
+	r.HandleFunc("/api/class/{EventId}", getEventClasses_sql).Methods("GET")
+	r.HandleFunc("/api/class/{EventId}/{ClassName}", getClass_sql).Methods("GET")
 	r.HandleFunc("/api/events/", getEvents_sql).Methods("GET")
 	r.HandleFunc("/api/events", createEvent_sql).Methods("POST")
 	r.HandleFunc("/api/events", optionsCors).Methods("OPTIONS")
