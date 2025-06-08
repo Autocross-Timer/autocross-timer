@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS `runs`
  `car_class`    varchar(45) NOT NULL ,
  `driver_name`  varchar(45) NOT NULL ,
  `cones`        int(255) NULL ,
+ `is_dnf`       tinyint(1) NOT NULL DEFAULT 0,
+ `gets_rerun`   tinyint(1) NOT NULL DEFAULT 0,
  `last_updated` int(255) NOT NULL ,
  `created`      int(255) NOT NULL,
 

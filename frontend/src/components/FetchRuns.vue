@@ -15,7 +15,7 @@
 
     const props = defineProps(['sortType', 'filterClass', 'leaderboard', 'eventId']);
 
-    const runs = ref([]);
+    const runs = ref(null);
     
     function updateRuns() {
         if(props.leaderboard){

@@ -25,6 +25,8 @@ type Run struct {
 	CarClass    string `json:"carClass" db:"car_class"`
 	DriverName  string `json:"driverName" db:"driver_name"`
 	Cones       int    `json:"cones,string" db:"cones"`
+	IsDnf       int    `json:"isDnf" db:"is_dnf"`
+	GetsRerun   int    `json:"getsRerun" db:"gets_rerun"`
 	LastUpdated int    `json:"lastUpdated" db:"last_updated"`
 	Created     int    `json:"created" db:"created"`
 }
@@ -194,7 +196,7 @@ func createRun_sql(w http.ResponseWriter, r *http.Request) {
 	run.LastUpdated = createTime
 	run.Created = createTime
 
-	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :last_updated, :created)", run)
+	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, is_dnf, gets_rerun, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :is_dnf, :gets_rerun, :last_updated, :created)", run)
 	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
 		log.Println("Run already exists")
 		http.Error(w, "Run already exists", http.StatusInternalServerError)

@@ -27,16 +27,30 @@
             <p class="run-container" v-for="(run, index) in runs" :key="runs.runNumber">
                 <span class="run-number">{{ index+1 }}</span>
                 <span class="run-name">{{ run.driverName }}</span>
-                <span class="right">
-                    <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
-                    <span class="run-paxtime">{{ run.paxTime }}</span>
-                </span>
+                <template v-if="isDnf!=1 && getsRerun!=1">
+                    <span class="right">
+                        <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
+                        <span class="run-paxtime">{{ run.paxTime }}</span>
+                    </span>
+                </template>
+                <template v-else-if="getsRerun==1">
+                    <span class="right">
+                        <span class="run-rerun">RERUN</span>
+                    </span>
+                </template>
+                <template v-else>
+                    <span class="right">
+                        <span class="run-dnf">DNF</span>
+                    </span>
+                </template> 
                 <br/>
                 <span class="run-class">{{ run.carClass }}</span>
                 <span class="run-car-number">#{{ run.carNumber }}</span>
-                <span class="right">
-                    <span class="run-rawtime">({{ run.rawTime }})</span>
-                </span>
+                <template v-if="isDnf!=1 && getsRerun!=1">
+                    <span class="right">
+                        <span class="run-rawtime">({{ run.rawTime }})</span>
+                    </span>
+                </template>
             </p>
         </div>
         <div v-else>
@@ -45,18 +59,32 @@
                     <span v-if="sortType" class="run-number">{{ index+1 }}</span>
                     <span v-else class="run-number">{{ run.runNumber }}</span>
                     <span class="run-name">{{ run.driverName }}</span>
-                    <span class="right">
-                        <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
-                        <span v-if="sortType==='raw'" class="run-rawtime">{{ run.rawTime }}</span>
-                        <span v-else class="run-paxtime">{{ run.paxTime }}</span>
-                    </span>
+                    <template v-if="isDnf!=1 && getsRerun!=1">
+                        <span class="right">
+                            <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
+                            <span v-if="sortType==='raw'" class="run-rawtime">{{ run.rawTime }}</span>
+                            <span v-else class="run-paxtime">{{ run.paxTime }}</span>
+                        </span>
+                    </template>
+                    <template v-else-if="getsRerun==1">
+                        <span class="right">
+                            <span class="run-rerun">RERUN</span>
+                        </span>
+                    </template>
+                    <template v-else>
+                        <span class="right">
+                            <span class="run-dnf">DNF</span>
+                        </span>
+                    </template> 
                     <br/>
                     <span class="run-class">{{ run.carClass }}</span>
                     <span class="run-car-number">#{{ run.carNumber }}</span>
-                    <span class="right">
-                        <span v-if="sortType==='raw'" class="run-paxtime">({{ run.paxTime }})</span>
-                        <span v-else class="run-rawtime">({{ run.rawTime }})</span>
-                    </span>
+                    <template v-if="isDnf!=1 && getsRerun!=1">
+                        <span class="right">
+                            <span v-if="sortType==='raw'" class="run-paxtime">({{ run.paxTime }})</span>
+                            <span v-else class="run-rawtime">({{ run.rawTime }})</span>
+                        </span>
+                    </template>
                 </RouterLink>
             </p>
         </div>
@@ -64,7 +92,7 @@
 </template>
 
 <style scoped>
-    .run-cones {
+    .run-cones, .run-rerun, .run-dnf {
         color: red;
         padding-right: 10px;
     }
