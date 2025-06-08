@@ -33,7 +33,7 @@
                         <span class="run-paxtime">{{ run.paxTime }}</span>
                     </span>
                 </template>
-                <template v-else-if="getsRerun==1">
+                <template v-else-if="run.getsRerun==1">
                     <span class="right">
                         <span class="run-rerun">RERUN</span>
                     </span>
@@ -66,7 +66,7 @@
                             <span v-else class="run-paxtime">{{ run.paxTime }}</span>
                         </span>
                     </template>
-                    <template v-else-if="getsRerun==1">
+                    <template v-else-if="run.getsRerun==1">
                         <span class="right">
                             <span class="run-rerun">RERUN</span>
                         </span>
