@@ -9,14 +9,17 @@
   const route = useRoute();
   const eventId = route.params.eventId;
   const classes = ref(null)
-  const sortClass = ref(null);
+  const sortClass = ref(false);
+  const leaderboard = ref(false);
 
   if(route.params.sortClass !== 'raw' && route.params.sortClass !== 'pax'){
     sortClass.value = route.params.sortClass;
+  }
+  else {
+    leaderboard.value = true;
   };
 
   watch(() => route.params.sortClass, (newSortClass) => {
-    sortClass.value = newSortClass;
     updateActiveButton(newSortClass);
   });
 
@@ -24,13 +27,17 @@
     if(newSortClass === 'raw'){
       sortType.value = 'raw';
       sortClass.value = false;
+      leaderboard.value = true;
     }
     else if(newSortClass === 'pax'){
       sortType.value = 'pax';
       sortClass.value = false;
+      leaderboard.value = true;
     }
     else{
       sortType.value = 'pax';
+      sortClass.value = newSortClass;
+      leaderboard.value = false;
     }
   }
 
@@ -45,7 +52,7 @@
     <RouterLink :to="'/event/' + eventId + '/leaderboard/pax'" class="link-container">PAX</RouterLink>
     <RouterLink :to="'/event/' + eventId + '/leaderboard/raw'" class="link-container">Raw</RouterLink>
     <RouterLink v-for="carClass in classes" :to="'/event/' + eventId + '/leaderboard/' + carClass" class="link-container">{{ carClass }}</RouterLink>
-    <GetRun :key="sortClass" :sortType="sortType" :leaderboard="false" :filterClass="sortClass" :eventId="eventId"/>
+    <GetRun :key="sortClass" :sortType="sortType" :leaderboard="leaderboard" :filterClass="sortClass" :eventId="eventId"/>
 </template>
 
 <style scoped>
