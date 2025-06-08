@@ -445,7 +445,7 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classRuns []Run
 
-	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND car_class = ? ORDER BY pax_time ASC", EventId, ClassName)
+	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND car_class = ? AND is_dnf = 0 AND gets_rerun = 0 ORDER BY pax_time ASC", EventId, ClassName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get class runs error", http.StatusInternalServerError)
