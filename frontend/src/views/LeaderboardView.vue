@@ -9,8 +9,9 @@
   const route = useRoute();
   const eventId = route.params.eventId;
   const classes = ref(null)
-  const sortClass = route.params.sortClass;
+  const sortClass = ref(route.params.sortClass);
   watch(() => route.params.sortClass, (newSortClass) => {
+    sortClass.value = newSortClass;
     updateActiveButton(newSortClass);
   });
 
