@@ -18,6 +18,11 @@
   function updateActiveButton(newSortClass) {
     if(newSortClass === 'raw'){
       sortType.value = 'raw';
+      sortClass.value = false;
+    }
+    else if(newSortClass === 'pax'){
+      sortType.value = 'pax';
+      sortClass.value = false;
     }
     else{
       sortType.value = 'pax';
