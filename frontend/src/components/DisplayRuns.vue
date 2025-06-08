@@ -27,7 +27,7 @@
             <p class="run-container" v-for="(run, index) in runs" :key="runs.runNumber">
                 <span class="run-number">{{ index+1 }}</span>
                 <span class="run-name">{{ run.driverName }}</span>
-                <template v-if="isDnf!=1 && getsRerun!=1">
+                <template v-if="isDnf!==1 && getsRerun!==1">
                     <span class="right">
                         <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
                         <span class="run-paxtime">{{ run.paxTime }}</span>
@@ -46,7 +46,7 @@
                 <br/>
                 <span class="run-class">{{ run.carClass }}</span>
                 <span class="run-car-number">#{{ run.carNumber }}</span>
-                <template v-if="isDnf!=1 && getsRerun!=1">
+                <template v-if="isDnf!==1 && getsRerun!==1">
                     <span class="right">
                         <span class="run-rawtime">({{ run.rawTime }})</span>
                     </span>
@@ -59,7 +59,7 @@
                     <span v-if="sortType" class="run-number">{{ index+1 }}</span>
                     <span v-else class="run-number">{{ run.runNumber }}</span>
                     <span class="run-name">{{ run.driverName }}</span>
-                    <template v-if="isDnf!=1 && getsRerun!=1">
+                    <template v-if="isDnf!==1 && getsRerun!==1">
                         <span class="right">
                             <span v-if="run.cones" class="run-cones">+{{ run.cones }}</span>
                             <span v-if="sortType==='raw'" class="run-rawtime">{{ run.rawTime }}</span>
@@ -79,7 +79,7 @@
                     <br/>
                     <span class="run-class">{{ run.carClass }}</span>
                     <span class="run-car-number">#{{ run.carNumber }}</span>
-                    <template v-if="isDnf!=1 && getsRerun!=1">
+                    <template v-if="isDnf!==1 && getsRerun!==1">
                         <span class="right">
                             <span v-if="sortType==='raw'" class="run-paxtime">({{ run.paxTime }})</span>
                             <span v-else class="run-rawtime">({{ run.rawTime }})</span>
