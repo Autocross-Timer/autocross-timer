@@ -387,10 +387,10 @@ func getLeaderboardRuns_sql(w http.ResponseWriter, r *http.Request) {
 
 	var leaderboardRuns []Run
 
-	err := db.Select(&leaderboardRuns, "SELECT * FROM runs WHERE pax_time > 0 AND event_id = ? AND is_dnf == 0 AND gets_rerun == 0", EventId)
+	err := db.Select(&leaderboardRuns, "SELECT * FROM runs WHERE pax_time > 0 AND event_id = ? AND is_dnf = 0 AND gets_rerun = 0", EventId)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Insert event error", http.StatusInternalServerError)
+		http.Error(w, "Leaderboard runs error", http.StatusInternalServerError)
 		return
 	}
 
