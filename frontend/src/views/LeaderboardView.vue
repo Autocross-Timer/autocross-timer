@@ -49,9 +49,11 @@
 
 <template>
     <NavLinks />
-    <RouterLink :to="'/event/' + eventId + '/leaderboard/pax'" class="link-container">PAX</RouterLink>
-    <RouterLink :to="'/event/' + eventId + '/leaderboard/raw'" class="link-container">Raw</RouterLink>
-    <RouterLink v-for="carClass in classes" :to="'/event/' + eventId + '/leaderboard/' + carClass" class="link-container">{{ carClass }}</RouterLink>
+    <div>
+      <RouterLink :to="'/event/' + eventId + '/leaderboard/pax'" class="link-container">PAX</RouterLink>
+      <RouterLink :to="'/event/' + eventId + '/leaderboard/raw'" class="link-container">Raw</RouterLink>
+      <RouterLink v-for="carClass in classes" :to="'/event/' + eventId + '/leaderboard/' + carClass" class="link-container">{{ carClass }}</RouterLink>
+    </div>
     <GetRun :key="sortClass" :sortType="sortType" :leaderboard="leaderboard" :filterClass="sortClass" :eventId="eventId"/>
 </template>
 
