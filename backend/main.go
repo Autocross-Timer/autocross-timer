@@ -17,18 +17,19 @@ import (
 )
 
 type Run struct {
-	EventId     string `json:"eventId" db:"event_id"`
-	RunNumber   int    `json:"runNumber,string" db:"run_number"`
-	CarNumber   string `json:"carNumber" db:"car_number"`
-	RawTime     string `json:"rawTime" db:"raw_time"`
-	PaxTime     string `json:"paxTime" db:"pax_time"`
-	CarClass    string `json:"carClass" db:"car_class"`
-	DriverName  string `json:"driverName" db:"driver_name"`
-	Cones       int    `json:"cones,string" db:"cones"`
-	IsDnf       int    `json:"isDnf" db:"is_dnf"`
-	GetsRerun   int    `json:"getsRerun" db:"gets_rerun"`
-	LastUpdated int    `json:"lastUpdated" db:"last_updated"`
-	Created     int    `json:"created" db:"created"`
+	EventId          string `json:"eventId" db:"event_id"`
+	RunNumber        int    `json:"runNumber,string" db:"run_number"`
+	CarNumber        string `json:"carNumber" db:"car_number"`
+	RawTime          string `json:"rawTime" db:"raw_time"`
+	PaxTime          string `json:"paxTime" db:"pax_time"`
+	CarClass         string `json:"carClass" db:"car_class"`
+	DriverName       string `json:"driverName" db:"driver_name"`
+	Cones            int    `json:"cones,string" db:"cones"`
+	IsDnf            int    `json:"isDnf" db:"is_dnf"`
+	GetsRerun        int    `json:"getsRerun" db:"gets_rerun"`
+	LastUpdated      int    `json:"lastUpdated" db:"last_updated"`
+	Created          int    `json:"created" db:"created"`
+	LeaderboardClass string `json:"leaderboardClass" db:"leaderboard_class"`
 }
 
 type Event struct {
@@ -196,7 +197,7 @@ func createRun_sql(w http.ResponseWriter, r *http.Request) {
 	run.LastUpdated = createTime
 	run.Created = createTime
 
-	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, is_dnf, gets_rerun, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :is_dnf, :gets_rerun, :last_updated, :created)", run)
+	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, is_dnf, gets_rerun, leaderboard_class, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :is_dnf, :gets_rerun, :leaderboard_class, :last_updated, :created)", run)
 	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
 		log.Println("Run already exists")
 		http.Error(w, "Run already exists", http.StatusInternalServerError)
@@ -415,7 +416,7 @@ func getEventClasses_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classes []string
 
-	err := db.Select(&classes, "SELECT DISTINCT car_class FROM runs WHERE event_id = ? AND car_class IS NOT NULL AND car_class != '' ORDER BY car_class", EventId)
+	err := db.Select(&classes, "SELECT DISTINCT leaderboard_class FROM runs WHERE event_id = ? AND car_class IS NOT NULL AND car_class != '' ORDER BY car_class", EventId)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get event classes error", http.StatusInternalServerError)
@@ -445,7 +446,7 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classRuns []Run
 
-	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND car_class = ? AND is_dnf = 0 AND gets_rerun = 0 ORDER BY pax_time ASC", EventId, ClassName)
+	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND leaderboard_class = ? AND is_dnf = 0 AND gets_rerun = 0 ORDER BY pax_time ASC", EventId, ClassName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get class runs error", http.StatusInternalServerError)
