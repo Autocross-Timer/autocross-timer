@@ -416,7 +416,7 @@ func getEventClasses_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classes []string
 
-	err := db.Select(&classes, "SELECT DISTINCT leaderboard_class FROM runs WHERE event_id = ? AND car_class IS NOT NULL AND car_class != '' ORDER BY car_class", EventId)
+	err := db.Select(&classes, "SELECT DISTINCT leaderboard_class FROM runs WHERE event_id = ? AND leaderboard_class IS NOT NULL AND leaderboard_class != '' ORDER BY leaderboard_class", EventId)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get event classes error", http.StatusInternalServerError)
