@@ -83,7 +83,7 @@ class CarEntry:
         self.car_num = car_num
         self.total_runs = 0
         self.car_class = random.choice(list(CarClass))
-        self.driver_name = generate_username()
+        self.driver_name = generate_username(1)[0]
 
     def add_run(self, run_num):
         self.total_runs +=1
@@ -92,14 +92,14 @@ class CarEntry:
         cones = random.randint(0, 10) // random.randint(1, 15)
 
         runData = {
-            "eventId":str(self.event_id),
-            "runNumber":str(run_num),
-            "carNumber":str(self.car_num),
-            "rawTime":str(base_time),
-            "paxTime":str(pax_time),
-            "carClass":str(self.car_class),
-            "driverName":self.driver_name,
-            "cones":str(cones),
+            "eventId": str(self.event_id),
+            "runNumber": str(run_num),
+            "carNumber": str(self.car_num),
+            "rawTime": str(base_time),
+            "paxTime": str(pax_time),
+            "carClass": str(self.car_class),
+            "driverName": str(self.driver_name),
+            "cones": str(cones),
         }
         req = requests.post(f"{BASE_URL}/api/runs/{self.event_id}", json=runData)
 
@@ -129,11 +129,11 @@ class Event:
         event_num = random.randint(1, 20)
         locaton = f"test_eventId: {self.event_id}"
         runData = {
-            "clubName":club,
-            "eventLocation":locaton,
-            "eventDate": datetime.today().strftime('%Y-%m-%d'),
-            "eventNumber":str(event_num),
-            "eventId":str(self.event_id),
+            "clubName": club,
+            "eventLocation": locaton,
+            "eventDate":  datetime.today().strftime('%Y-%m-%d'),
+            "eventNumber": str(event_num),
+            "eventId": str(self.event_id),
         }
         LOG.info(f"##############################################")
         LOG.info(f"# {club}")
