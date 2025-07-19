@@ -446,7 +446,31 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classRuns []Run
 
-	err := db.Select(&classRuns, "SELECT * FROM runs WHERE event_id = ? AND leaderboard_class = ? AND is_dnf = 0 AND gets_rerun = 0 ORDER BY pax_time ASC", EventId, ClassName)
+	/*
+		SELECT r.*
+		FROM runs r
+		INNER JOIN (
+			SELECT
+				car_number,
+				MIN(raw_time) AS lowest_raw_time
+			FROM
+				runs
+			WHERE
+				event_id = ?
+				AND leaderboard_class = ?
+			GROUP BY
+				car_number
+		) min_run
+		ON r.car_number = min_run.car_number
+		AND r.raw_time = min_run.lowest_raw_time
+		WHERE
+			r.event_id = ?
+			AND r.leaderboard_class = ?
+		ORDER BY
+			min_run.lowest_raw_time ASC;
+	*/
+
+	err := db.Select(&classRuns, "SELECT r.* FROM runs r INNER JOIN (SELECT car_number, MIN(raw_time) AS lowest_raw_time FROM runs WHERE event_id = ? AND leaderboard_class = ? GROUP BY car_number) min_run ON r.car_number = min_run.car_number AND r.raw_time = min_run.lowest_raw_time WHERE r.event_id = ? AND r.leaderboard_class = ? ORDER BY min_run.lowest_raw_time ASC;", EventId, ClassName, EventId, ClassName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get class runs error", http.StatusInternalServerError)
