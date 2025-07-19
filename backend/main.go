@@ -452,7 +452,7 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN (
 			SELECT
 				car_number,
-				MIN(raw_time) AS lowest_raw_time
+				MIN(pax_time) AS lowest_pax_time
 			FROM
 				runs
 			WHERE
@@ -464,15 +464,15 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 				car_number
 		) min_run
 		ON r.car_number = min_run.car_number
-		AND r.raw_time = min_run.lowest_raw_time
+		AND r.pax_time = min_run.lowest_pax_time
 		WHERE
 			r.event_id = ?
 			AND r.leaderboard_class = ?
 		ORDER BY
-			min_run.lowest_raw_time ASC;
+			min_run.lowest_pax_time ASC;
 	*/
 
-	err := db.Select(&classRuns, "SELECT r.* FROM runs r INNER JOIN (SELECT car_number, MIN(raw_time) AS lowest_raw_time FROM runs WHERE event_id = ? AND leaderboard_class = ? AND is_dnf = 0 AND gets_rerun = 0 GROUP BY car_number) min_run ON r.car_number = min_run.car_number AND r.raw_time = min_run.lowest_raw_time WHERE r.event_id = ? AND r.leaderboard_class = ? ORDER BY min_run.lowest_raw_time ASC;", EventId, ClassName, EventId, ClassName)
+	err := db.Select(&classRuns, "SELECT r.* FROM runs r INNER JOIN (SELECT car_number, MIN(pax_time) AS lowest_pax_time FROM runs WHERE event_id = ? AND leaderboard_class = ? AND is_dnf = 0 AND gets_rerun = 0 GROUP BY car_number) min_run ON r.car_number = min_run.car_number AND r.pax_time = min_run.lowest_pax_time WHERE r.event_id = ? AND r.leaderboard_class = ? ORDER BY min_run.lowest_pax_time ASC;", EventId, ClassName, EventId, ClassName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get class runs error", http.StatusInternalServerError)
