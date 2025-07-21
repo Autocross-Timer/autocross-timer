@@ -381,14 +381,49 @@ func getLeaderboardRuns_sql(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	EventId := params["EventId"]
+	SortType := params["SortType"]
 	if EventId == "" {
 		http.Error(w, "Missing event ID", http.StatusBadRequest)
 		return
 	}
+	if SortType != "pax" && SortType != "raw" {
+		http.Error(w, "Invalid sort type", http.StatusBadRequest)
+		return
+	}
 
 	var leaderboardRuns []Run
+	var SortText string
 
-	err := db.Select(&leaderboardRuns, "SELECT * FROM runs WHERE pax_time > 0 AND event_id = ? AND is_dnf = 0 AND gets_rerun = 0", EventId)
+	if SortType == "pax" {
+		SortText = "pax_time"
+	}
+	if SortType == "raw" {
+		SortText = "raw_time"
+	}
+
+	query := `SELECT r.*
+		FROM runs r
+		INNER JOIN (
+			SELECT
+				car_number,
+				MIN(CAST(` + SortText + ` AS DECIMAL(10,3))) AS lowest_sort_time
+			FROM
+				runs
+			WHERE
+				event_id = ?
+				AND is_dnf = 0
+				AND gets_rerun = 0
+			GROUP BY
+				car_number
+		) min_run
+		ON r.car_number = min_run.car_number
+		AND CAST(r.` + SortText + ` AS DECIMAL(10,3)) = min_run.lowest_sort_time
+		WHERE
+			r.event_id = ?
+		ORDER BY
+			min_run.lowest_sort_time ASC;`
+
+	err := db.Select(&leaderboardRuns, query, EventId, EventId)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Leaderboard runs error", http.StatusInternalServerError)
@@ -446,13 +481,12 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 
 	var classRuns []Run
 
-	/*
-		SELECT r.*
+	query := `SELECT r.*
 		FROM runs r
 		INNER JOIN (
 			SELECT
 				car_number,
-				MIN(raw_time) AS lowest_raw_time
+				MIN(CAST(raw_time AS DECIMAL(10,3))) AS lowest_raw_time
 			FROM
 				runs
 			WHERE
@@ -464,15 +498,14 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 				car_number
 		) min_run
 		ON r.car_number = min_run.car_number
-		AND r.raw_time = min_run.lowest_raw_time
+		AND CAST(r.raw_time AS DECIMAL(10,3)) = min_run.lowest_raw_time
 		WHERE
 			r.event_id = ?
 			AND r.leaderboard_class = ?
 		ORDER BY
-			min_run.lowest_raw_time ASC;
-	*/
+			min_run.lowest_raw_time ASC;`
 
-	err := db.Select(&classRuns, "SELECT r.* FROM runs r INNER JOIN (SELECT car_number, MIN(raw_time) AS lowest_raw_time FROM runs WHERE event_id = ? AND leaderboard_class = ? AND is_dnf = 0 AND gets_rerun = 0 GROUP BY car_number) min_run ON r.car_number = min_run.car_number AND r.raw_time = min_run.lowest_raw_time WHERE r.event_id = ? AND r.leaderboard_class = ? ORDER BY min_run.lowest_raw_time ASC;", EventId, ClassName, EventId, ClassName)
+	err := db.Select(&classRuns, query, EventId, ClassName, EventId, ClassName)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Get class runs error", http.StatusInternalServerError)
@@ -536,7 +569,7 @@ func main() {
 	r.HandleFunc("/api/runs/{EventId}/{RunNumber}", updateRun).Methods("POST")
 	r.HandleFunc("/api/runs/{EventId}/{RunNumber}", optionsCors).Methods("OPTIONS")
 	r.HandleFunc("/api/car/{EventId}/{CarNumber}", getCarsRuns_sql).Methods("GET")
-	r.HandleFunc("/api/runs/leaderboard/{EventId}/", getLeaderboardRuns_sql).Methods("GET")
+	r.HandleFunc("/api/runs/leaderboard/{EventId}/{SortType}", getLeaderboardRuns_sql).Methods("GET")
 	r.HandleFunc("/api/event/{EventId}", getEvent_sql).Methods("GET")
 	r.HandleFunc("/api/class/{EventId}", getEventClasses_sql).Methods("GET")
 	r.HandleFunc("/api/class/{EventId}/{ClassName}", getClass_sql).Methods("GET")

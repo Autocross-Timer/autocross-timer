@@ -19,7 +19,7 @@
     
     function updateRuns() {
         if(props.leaderboard){
-            getLeaderboardRuns(props.eventId)
+            getLeaderboardRuns(props.eventId, props.sortType)
             .then(data => {
                 runs.value = data
             });

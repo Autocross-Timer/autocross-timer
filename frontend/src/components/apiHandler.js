@@ -5,8 +5,8 @@ export function getAllRuns(eventId) {
         .then(response => response.json())
 };
 
-export function getLeaderboardRuns(eventId) {
-    return fetch(`${API_URL}/runs/leaderboard/${eventId}/`)
+export function getLeaderboardRuns(eventId, sortType) {
+    return fetch(`${API_URL}/runs/leaderboard/${eventId}/${sortType}`)
         .then(response => response.json())
 }
 
