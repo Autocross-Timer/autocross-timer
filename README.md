@@ -44,4 +44,5 @@ It is very simple to deploy this project. Configure all of the variables above, 
   - Store runs in local storage
 - Add Docker health checks to web and API
 - Make driver view card better
+  - Make best times only check valid runs
 - Make programatic run simulation
