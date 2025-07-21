@@ -486,7 +486,7 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 		INNER JOIN (
 			SELECT
 				car_number,
-				MIN(CAST(raw_time AS DECIMAL(10,3))) AS lowest_raw_time
+				MIN(CAST(pax_time AS DECIMAL(10,3))) AS lowest_pax_time
 			FROM
 				runs
 			WHERE
@@ -498,12 +498,12 @@ func getClass_sql(w http.ResponseWriter, r *http.Request) {
 				car_number
 		) min_run
 		ON r.car_number = min_run.car_number
-		AND CAST(r.raw_time AS DECIMAL(10,3)) = min_run.lowest_raw_time
+		AND CAST(r.pax_time AS DECIMAL(10,3)) = min_run.lowest_pax_time
 		WHERE
 			r.event_id = ?
 			AND r.leaderboard_class = ?
 		ORDER BY
-			min_run.lowest_raw_time ASC;`
+			min_run.lowest_pax_time ASC;`
 
 	err := db.Select(&classRuns, query, EventId, ClassName, EventId, ClassName)
 	if err != nil {
