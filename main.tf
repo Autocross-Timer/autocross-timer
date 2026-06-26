@@ -28,7 +28,7 @@ data "aws_ami" "amzn-linux-2023-ami" {
 
   filter {
     name   = "name"
-    values = ["al2023-ami-2023.*-x86_64"]
+    values = ["al2023-ami-2023.*-arm64"]
   }
 }
 
@@ -52,7 +52,7 @@ resource "aws_subnet" "autocross_timer_subnet" {
 
 resource "aws_instance" "autocross_timer" {
   ami           = data.aws_ami.amzn-linux-2023-ami.id
-  instance_type = "t2.micro"
+  instance_type = "t4g.small"
   subnet_id     = aws_subnet.autocross_timer_subnet.id
   key_name      = aws_key_pair.github_actions.key_name
   associate_public_ip_address = true
