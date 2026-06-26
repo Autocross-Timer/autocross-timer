@@ -28,7 +28,7 @@ services:
     secrets:
       - DB_PASSWORD
   caddy:
-    image: caddy:2.9-alpine
+    image: caddy:alpine
     restart: unless-stopped
     depends_on:
       - api
@@ -46,7 +46,7 @@ services:
     environment:
       - BASE_URL=${BASE_URL}
   db:
-    image: mysql:9.2
+    image: mysql:9.7
     restart: unless-stopped
     networks:
       - backend

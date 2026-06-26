@@ -46,3 +46,4 @@ It is very simple to deploy this project. Configure all of the variables above, 
 - Make driver view card better
   - Make best times only check valid runs
 - Make programatic run simulation
+- Add some kind of variable for build to chose amd64 or arm64

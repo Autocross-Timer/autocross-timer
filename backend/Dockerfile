@@ -19,7 +19,7 @@ COPY . .
 RUN go mod download
 RUN go mod verify
 
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/api
+RUN GOOS=linux GOARCH=arm64 go build -ldflags="-w -s" -o /go/bin/api
 
 # Build container
 FROM scratch AS prod
