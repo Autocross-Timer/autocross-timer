@@ -209,7 +209,7 @@ func createRun_sql(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(run)
+	json.NewEncoder(w).Encode("Run created")
 }
 
 func deleteRun_sql(w http.ResponseWriter, r *http.Request) {
