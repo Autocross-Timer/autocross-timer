@@ -197,7 +197,7 @@ func createRun_sql(w http.ResponseWriter, r *http.Request) {
 	run.LastUpdated = createTime
 	run.Created = createTime
 
-	_, err := db.NamedExec("INSERT INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, is_dnf, gets_rerun, leaderboard_class, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :is_dnf, :gets_rerun, :leaderboard_class, :last_updated, :created)", run)
+	_, err := db.NamedExec("REPLACE INTO runs (event_id, run_number, car_number, raw_time, pax_time, car_class, driver_name, cones, is_dnf, gets_rerun, leaderboard_class, last_updated, created) VALUES (:event_id, :run_number, :car_number, :raw_time, :pax_time, :car_class, :driver_name, :cones, :is_dnf, :gets_rerun, :leaderboard_class, :last_updated, :created)", run)
 	if err != nil && strings.Contains(err.Error(), "Duplicate entry") {
 		log.Println("Run already exists")
 		http.Error(w, "Run already exists", http.StatusInternalServerError)
